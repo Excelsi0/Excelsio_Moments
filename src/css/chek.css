@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    border: 2px solid black;
+}
+
+/* Задача 1: скрыть все карточки с классом mobile */
+
+.card:has(.mobile) {
+    background-color: aqua;
+}
+
+/* Задача 2: всем карточкам, которые содержат <p> изменить цвет заднего фона на любой другой цвет */
