@@ -95,11 +95,13 @@ img {
 	border-radius: 50%;
 	background-color: #ffffff;
 	box-shadow: 0 0 50px 30px #fff;
+}
 
-	@media (hover: none) {
+@media (hover: none) {
+	.cursor {
 		display: none;
-
 	}
+
 }
 
 ::selection {
@@ -173,15 +175,14 @@ img {
 	color: var(--color-light);
 	text-decoration: none;
 
-	transition: all linear 0.2s;
+	transition: all linear 0.2s
+}
 
-	@media screen and (max-width: 576px) {
-		margin-top: 27px;
-		width: 120px;
-		font-size: 14px;
-	}
 
-	@media (hover:hover) {
+@media (hover: hover) {
+	.btn {
+		cursor: pointer;
+		transition: all 0.5s ease;
 
 		&:hover,
 		&:focus {
@@ -198,6 +199,22 @@ img {
 		}
 	}
 }
+
+@media (hover: none) {
+	.btn:active {
+		transform: none;
+	}
+
+}
+
+@media screen and (max-width: 576px) {
+	.btn {
+		margin-top: 27px;
+		width: 120px;
+		font-size: 14px;
+	}
+}
+
 
 
 .hero__contact-info {
@@ -297,7 +314,7 @@ img {
 
 }
 
-@media (hover:hover) {
+@media (hover: hover) {
 	.keywords:hover {
 		cursor: default;
 	}
@@ -496,7 +513,7 @@ img {
 			filter: grayscale(100%);
 		}
 
-		@media (hover:hover) {
+		@media (hover: hover) {
 			.card:hover img {
 				transform: scale(1.2);
 				filter: grayscale(0);
@@ -545,7 +562,7 @@ img {
 			filter: grayscale(100%);
 		}
 
-		@media (hover:hover) {
+		@media (hover: hover) {
 			.card:hover img {
 				transform: scale(1.2);
 				filter: grayscale(0);
@@ -676,7 +693,7 @@ img {
 		font-size: 20px;
 		color: var(--color-light);
 
-		@media screen and(max-width:768px) {
+		@media screen and (max-width:768px) {
 			font-size: 16px;
 
 		}
@@ -695,7 +712,7 @@ img {
 
 		}
 
-		@media (hover:hover) {
+		@media (hover: hover) {
 
 			&:hover {
 				text-shadow: 0 0 5px #fff;
