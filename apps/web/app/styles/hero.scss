@@ -97,7 +97,6 @@
   svg {
     inline-size: 100%;
     block-size: 100%;
-    fill: url("#heroContourViolet");
     fill: var(--ex-violet);
     stroke: rgb(255 255 255 / 45%);
     stroke-width: 0.8;
@@ -142,10 +141,10 @@
   --hero-py: 0;
 
   position: absolute;
-  inset-block-start: -4%;
+  inset-block-start: -8%;
   inset-inline-start: 50%;
   z-index: 1;
-  inline-size: min(90vw, 430px);
+  inline-size: min(104vw, 460px);
   aspect-ratio: 1;
   translate: -50% 0;
 }
