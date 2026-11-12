@@ -1,0 +1,642 @@
+/*
+ * EXCELSIO 2.0 — Hero (Этап 2D).
+ * Mobile-first от 360 px. Только токены --ex-*, только transform/opacity в анимациях.
+ * Объект построен слоями CSS-градиентов и инлайн-SVG: без WebGL, canvas и blur-фильтров.
+ */
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(12px, 3.5vw, 28px);
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+  padding-block: calc(env(safe-area-inset-top, 0px) + clamp(14px, 3.5vw, 26px))
+    calc(env(safe-area-inset-bottom, 0px) + clamp(14px, 3.5vw, 26px));
+  padding-inline: var(--ex-gutter);
+  overflow: clip;
+  isolation: isolate;
+  background:
+    radial-gradient(130% 85% at 50% -18%, rgb(109 40 217 / 22%), transparent 62%),
+    radial-gradient(90% 60% at 100% 110%, rgb(29 78 216 / 14%), transparent 68%),
+    var(--ex-bg);
+  // Вертикальный скролл остаётся нативным, жесты не перехватываются.
+  touch-action: pan-y;
+}
+
+/* ── Атмосфера: световая сцена под контентом ─────────────────── */
+
+.hero__atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero__glow {
+  position: absolute;
+  border-radius: 50%;
+
+  &--violet {
+    inset-block-start: -22%;
+    inset-inline-start: 50%;
+    inline-size: min(118vw, 760px);
+    aspect-ratio: 1;
+    translate: -50% 0;
+    background: radial-gradient(closest-side, rgb(139 92 246 / 26%), transparent 72%);
+  }
+
+  &--blue {
+    inset-block-start: 34%;
+    inset-inline-end: -32%;
+    inline-size: min(90vw, 560px);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgb(59 130 246 / 20%), transparent 74%);
+  }
+
+  &--coral {
+    inset-block-end: -14%;
+    inset-inline-start: -26%;
+    inline-size: min(72vw, 420px);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgb(255 107 91 / 16%), transparent 76%);
+  }
+}
+
+/* ── Шапка ───────────────────────────────────────────────────── */
+
+.hero__header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ex-space-4);
+}
+
+.hero__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  color: var(--ex-text);
+  text-decoration: none;
+
+  &:focus-visible {
+    box-shadow: var(--ex-focus-ring);
+  }
+}
+
+.hero__brand-mark {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+
+  svg {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: url("#heroContourViolet");
+    fill: var(--ex-violet);
+    stroke: rgb(255 255 255 / 45%);
+    stroke-width: 0.8;
+  }
+}
+
+.hero__brand-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.hero__edition {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ex-text-muted);
+  font-size: var(--ex-fs-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  span:nth-child(2) {
+    color: var(--ex-violet);
+  }
+}
+
+/* ── Сцена ───────────────────────────────────────────────────── */
+
+.hero__stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-items: end;
+  min-block-size: clamp(420px, 60vh, 560px);
+}
+
+/* ── Скульптура ──────────────────────────────────────────────── */
+
+.hero__sculpture {
+  --hero-px: 0;
+  --hero-py: 0;
+
+  position: absolute;
+  inset-block-start: -4%;
+  inset-inline-start: 50%;
+  z-index: 1;
+  inline-size: min(90vw, 430px);
+  aspect-ratio: 1;
+  translate: -50% 0;
+}
+
+.hero__aura {
+  position: absolute;
+  inset: -16%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(139 92 246 / 40%), transparent 70%),
+    radial-gradient(closest-side at 72% 78%, rgb(255 107 91 / 22%), transparent 72%);
+  opacity: 0.9;
+  transform: translate3d(
+    calc(var(--hero-px) * 20px),
+    calc(var(--hero-py) * 20px),
+    0
+  );
+  animation: hero-breathe 16s var(--ex-ease-standard) infinite;
+}
+
+.hero__glass {
+  position: absolute;
+  inset: 7%;
+  overflow: hidden;
+  border-radius: 46% 54% 57% 43% / 51% 43% 57% 49%;
+  background:
+    radial-gradient(120% 95% at 26% 14%, rgb(255 255 255 / 24%), transparent 44%),
+    radial-gradient(95% 85% at 78% 20%, rgb(139 92 246 / 58%), transparent 62%),
+    radial-gradient(120% 105% at 62% 86%, rgb(59 130 246 / 50%), transparent 64%),
+    radial-gradient(70% 62% at 16% 80%, rgb(255 107 91 / 32%), transparent 66%),
+    conic-gradient(
+      from 210deg at 50% 50%,
+      rgb(139 92 246 / 42%),
+      rgb(29 78 216 / 34%),
+      rgb(255 107 91 / 20%),
+      rgb(139 92 246 / 42%)
+    );
+  box-shadow:
+    inset 0 0 54px rgb(255 255 255 / 13%),
+    inset 22px 26px 80px rgb(255 255 255 / 9%),
+    inset -30px -44px 96px rgb(5 5 7 / 72%),
+    0 34px 90px rgb(109 40 217 / 30%);
+  transform: translate3d(
+    calc(var(--hero-px) * 10px),
+    calc(var(--hero-py) * 10px),
+    0
+  );
+}
+
+.hero__core {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+
+  &--violet {
+    inset: 8% 32% 34% 4%;
+    background: radial-gradient(closest-side, rgb(196 181 253 / 90%), transparent 76%);
+    opacity: 0.75;
+    transform: translate3d(
+      calc(var(--hero-px) * 24px),
+      calc(var(--hero-py) * 24px),
+      0
+    );
+    animation: hero-drift-violet 19s ease-in-out infinite;
+  }
+
+  &--blue {
+    inset: 26% 6% 18% 40%;
+    background: radial-gradient(closest-side, rgb(147 197 253 / 80%), transparent 78%);
+    opacity: 0.68;
+    transform: translate3d(
+      calc(var(--hero-px) * -18px),
+      calc(var(--hero-py) * -18px),
+      0
+    );
+    animation: hero-drift-blue 23s ease-in-out infinite;
+  }
+
+  &--coral {
+    inset: 62% 22% 6% 28%;
+    background: radial-gradient(closest-side, rgb(255 138 122 / 74%), transparent 72%);
+    opacity: 0.55;
+    transform: translate3d(
+      calc(var(--hero-px) * -30px),
+      calc(var(--hero-py) * -30px),
+      0
+    );
+    animation: hero-drift-coral 27s ease-in-out infinite;
+  }
+}
+
+.hero__sheen {
+  position: absolute;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 62%),
+    transparent
+  );
+
+  &--a {
+    inset-block-start: 16%;
+    inset-inline: 10%;
+    block-size: 14%;
+    border-radius: 50%;
+    rotate: -14deg;
+    opacity: 0.5;
+    transform: translate3d(0, calc(var(--hero-py) * 16px), 0);
+  }
+
+  &--b {
+    inset-block-start: 42%;
+    inset-inline: 34% 6%;
+    block-size: 8%;
+    border-radius: 50%;
+    rotate: 24deg;
+    opacity: 0.34;
+    transform: translate3d(0, calc(var(--hero-py) * -12px), 0);
+  }
+}
+
+.hero__rim {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: inherit;
+  mask-image: linear-gradient(
+    152deg,
+    #000 10%,
+    rgb(0 0 0 / 35%) 46%,
+    transparent 72%
+  );
+  -webkit-mask-image: linear-gradient(
+    152deg,
+    #000 10%,
+    rgb(0 0 0 / 35%) 46%,
+    transparent 72%
+  );
+}
+
+.hero__contour {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  opacity: 0.85;
+  transform: translate3d(
+    calc(var(--hero-px) * -26px),
+    calc(var(--hero-py) * -26px),
+    0
+  );
+}
+
+/* ── Типографика ─────────────────────────────────────────────── */
+
+.hero__type {
+  position: relative;
+  z-index: 2;
+  padding-block-end: clamp(2px, 1.4vw, 10px);
+
+  // Тёмная подложка: гарантирует контраст текста на светящемся объекте.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -26% -8% -18% -10%;
+    z-index: -1;
+    background: radial-gradient(
+      72% 100% at 22% 62%,
+      rgb(8 8 11 / 88%),
+      transparent 72%
+    );
+    pointer-events: none;
+  }
+}
+
+.hero__title {
+  position: relative;
+  display: block;
+  font-family: var(--ex-font-display);
+  font-size: clamp(2.7rem, 17vw, 4.6rem);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+.hero__title-fill {
+  position: relative;
+  display: block;
+  background: linear-gradient(
+    172deg,
+    var(--ex-text) 0%,
+    #d9d2ff 58%,
+    var(--ex-violet) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 14px 46px rgb(139 92 246 / 28%));
+}
+
+.hero__title-ghost {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 20%);
+  translate: 5px 6px;
+  opacity: 0.9;
+}
+
+.hero__tagline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-block-start: clamp(10px, 3vw, 18px);
+  color: var(--ex-text-muted);
+  font-size: clamp(0.8125rem, 3.1vw, 0.9375rem);
+  letter-spacing: 0.02em;
+}
+
+.hero__tagline-rule {
+  inline-size: clamp(20px, 8vw, 46px);
+  block-size: 1px;
+  background: linear-gradient(90deg, var(--ex-violet), transparent);
+}
+
+/* ── Подвал экрана ───────────────────────────────────────────── */
+
+.hero__footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ex-space-4);
+}
+
+.hero__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ex-text-muted);
+  font-size: var(--ex-fs-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero__meta-dot {
+  inline-size: 3px;
+  block-size: 3px;
+  border-radius: 50%;
+  background: var(--ex-coral);
+}
+
+.hero__scroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero__scroll-label {
+  color: var(--ex-text-dim);
+  font-size: 0.625rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+
+.hero__scroll-line {
+  position: relative;
+  inline-size: 1px;
+  block-size: 42px;
+  background: linear-gradient(180deg, var(--ex-line-strong), transparent);
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: -1px;
+    block-size: 14px;
+    background: linear-gradient(180deg, transparent, var(--ex-violet));
+    animation: hero-scroll-cue 2.6s var(--ex-ease-standard) infinite;
+  }
+}
+
+/* Плёночное зерно поверх сцены (статичное, без анимации). */
+.hero__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ── Анимации: только transform и opacity ────────────────────── */
+
+@keyframes hero-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: translate3d(
+        calc(var(--hero-px) * 20px),
+        calc(var(--hero-py) * 20px),
+        0
+      )
+      scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate3d(
+        calc(var(--hero-px) * 20px),
+        calc(var(--hero-py) * 20px),
+        0
+      )
+      scale(1.05);
+  }
+}
+
+@keyframes hero-drift-violet {
+  0%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+
+  50% {
+    translate: 6% 4%;
+    scale: 1.08;
+  }
+}
+
+@keyframes hero-drift-blue {
+  0%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+
+  50% {
+    translate: -5% -6%;
+    scale: 1.06;
+  }
+}
+
+@keyframes hero-drift-coral {
+  0%,
+  100% {
+    translate: 0 0;
+    opacity: 0.45;
+  }
+
+  50% {
+    translate: 4% -5%;
+    opacity: 0.7;
+  }
+}
+
+@keyframes hero-scroll-cue {
+  0% {
+    transform: translate3d(0, -120%, 0);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate3d(0, 320%, 0);
+    opacity: 0;
+  }
+}
+
+/* ── Планшет ─────────────────────────────────────────────────── */
+
+@media (min-width: 40rem) {
+  .hero__sculpture {
+    inline-size: min(74vw, 520px);
+    inset-block-start: -2%;
+  }
+
+  .hero__title {
+    font-size: clamp(3.4rem, 14vw, 6rem);
+  }
+}
+
+/* ── Десктоп: асимметрия «текст слева — объект справа» ───────── */
+
+@media (min-width: 64rem) {
+  .hero {
+    padding-inline: clamp(32px, 5vw, 76px);
+  }
+
+  .hero__stage {
+    min-block-size: clamp(520px, 68vh, 780px);
+    align-items: center;
+  }
+
+  .hero__sculpture {
+    inset-block-start: 50%;
+    inset-inline-start: auto;
+    inset-inline-end: 2%;
+    inline-size: min(44vw, 620px);
+    translate: 0 -50%;
+  }
+
+  .hero__type {
+    position: absolute;
+    inset-block-end: 12%;
+    inset-inline-start: 0;
+    inline-size: min(74%, 860px);
+  }
+
+  .hero__title {
+    font-size: clamp(4rem, 8.6vw, 9rem);
+  }
+
+  .hero__title-ghost {
+    translate: 8px 10px;
+  }
+
+  .hero__tagline {
+    margin-block-start: clamp(16px, 2vw, 26px);
+    font-size: 1rem;
+  }
+
+  .hero__tagline-rule {
+    inline-size: 64px;
+  }
+
+  .hero__scroll {
+    flex-direction: row-reverse;
+    gap: 12px;
+  }
+
+  .hero__scroll-line {
+    inline-size: 64px;
+    block-size: 1px;
+    background: linear-gradient(90deg, transparent, var(--ex-line-strong));
+
+    &::after {
+      inset-block: -1px;
+      inset-inline-start: 0;
+      inline-size: 18px;
+      block-size: auto;
+      background: linear-gradient(90deg, transparent, var(--ex-violet));
+      animation-name: hero-scroll-cue-horizontal;
+    }
+  }
+}
+
+@keyframes hero-scroll-cue-horizontal {
+  0% {
+    transform: translate3d(-120%, 0, 0);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate3d(360%, 0, 0);
+    opacity: 0;
+  }
+}
+
+/* ── Reduced motion: статичная, но полноценная композиция ────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__aura,
+  .hero__core,
+  .hero__scroll-line::after {
+    animation: none;
+  }
+
+  .hero__aura,
+  .hero__glass,
+  .hero__core,
+  .hero__sheen,
+  .hero__contour {
+    transform: none;
+  }
+}
