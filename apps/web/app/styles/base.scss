@@ -1,7 +1,8 @@
 /*
- * Базовые стили EXCELSIO 2.0 (Этап 2A).
+ * Базовые стили EXCELSIO 2.0.
  * Mobile-first: базовые правила рассчитаны на 360–400 px,
  * далее — только min-width медиазапросы.
+ * Стили конкретных экранов живут рядом с маршрутами (см. app/styles/hero.scss).
  */
 
 *,
@@ -60,126 +61,17 @@ video {
   border-radius: var(--ex-radius-sm);
 }
 
-/* ── Главная-заглушка ───────────────────────────────────────── */
-
-.home {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding-block: calc(var(--ex-section-y) + env(safe-area-inset-top))
-    calc(var(--ex-section-y) + env(safe-area-inset-bottom));
-  padding-inline: var(--ex-gutter);
-  isolation: isolate;
-  overflow: hidden;
-}
-
-/* Мягкое свечение (Black Mist). Статичное: без анимации и без blur-анимаций. */
-.home__mist {
+/* Доступно скринридерам, скрыто визуально. */
+.visually-hidden {
   position: absolute;
-  inset: -20% -10% auto;
-  height: 90%;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      60% 50% at 50% 0%,
-      rgb(139 92 246 / 22%),
-      transparent 70%
-    ),
-    radial-gradient(
-      40% 40% at 85% 25%,
-      rgb(59 130 246 / 14%),
-      transparent 70%
-    ),
-    radial-gradient(
-      35% 35% at 10% 35%,
-      rgb(255 107 91 / 10%),
-      transparent 70%
-    );
-}
-
-.home__frame {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ex-space-10);
-  width: 100%;
-  max-inline-size: var(--ex-container);
-  margin-inline: auto;
-}
-
-.home__brand {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ex-space-3);
-}
-
-.home__logo {
-  font-family: var(--ex-font-display);
-  font-size: var(--ex-fs-display);
-  font-weight: 700;
-  line-height: var(--ex-lh-tight);
-  letter-spacing: var(--ex-tracking-display);
-  text-transform: uppercase;
-  background: linear-gradient(
-    135deg,
-    var(--ex-text) 0%,
-    var(--ex-violet) 55%,
-    var(--ex-blue) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-.home__tagline {
-  max-inline-size: var(--ex-measure);
-  color: var(--ex-text-muted);
-  font-size: clamp(1rem, 3.6vw, 1.25rem);
-  letter-spacing: 0.01em;
-}
-
-.home__status {
-  display: inline-flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: var(--ex-space-2);
-  padding: var(--ex-space-2) var(--ex-space-4);
-  border: 1px solid var(--ex-line);
-  border-radius: var(--ex-radius-pill);
-  background-color: var(--ex-surface);
-  color: var(--ex-coral-soft);
-  font-size: var(--ex-fs-sm);
-  letter-spacing: var(--ex-tracking-caps);
-  text-transform: uppercase;
-}
-
-.home__status::before {
-  content: "";
-  inline-size: 6px;
-  block-size: 6px;
-  border-radius: var(--ex-radius-pill);
-  background-color: var(--ex-coral);
-}
-
-/* ── Адаптив (только min-width) ─────────────────────────────── */
-
-@media (min-width: 40rem) {
-  .home {
-    justify-content: center;
-  }
-
-  .home__frame {
-    gap: var(--ex-space-12);
-  }
-}
-
-@media (min-width: 64rem) {
-  .home__frame {
-    gap: var(--ex-space-16);
-  }
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── Уважение к настройкам пользователя ─────────────────────── */
