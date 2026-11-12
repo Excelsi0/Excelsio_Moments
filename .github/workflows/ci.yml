@@ -60,10 +60,14 @@ jobs:
       - name: Diagnostics (temporary)
         run: |
           echo "::notice title=node::$(node -v) / npm $(npm -v)"
-          echo "::notice title=npm-config::omit=[$(npm config get omit)] node_env=[${NODE_ENV:-unset}]"
-          echo "::notice title=rr-dev-scope::$(ls node_modules/@react-router 2>&1 | tr '\n' ' ')"
-          node -e "const l=require('./package-lock.json');const p=l.packages||{};const k=Object.keys(p).filter(x=>x.includes('@react-router/dev'));console.log(k.map(x=>x+' dev='+p[x].dev).join(' | ')||'NOT IN LOCK')" > lockinfo.txt 2>&1 || true
-          echo "::notice title=lock::$(cat lockinfo.txt 2>/dev/null | head -c 300)"
+          echo "::notice title=dev-dir::$(ls node_modules/@react-router/dev 2>&1 | head -n 20 | tr '\n' ' ')"
+          if [ -f node_modules/@react-router/dev/package.json ]; then
+            echo "::notice title=pkg-file::PRESENT"
+          else
+            echo "::notice title=pkg-file::MISSING"
+          fi
+          node -e "try{console.log(require.resolve('@react-router/dev/package.json'))}catch(e){console.log('RESOLVE_ERR: '+(e.code||e.message))}" > resolve.txt 2>&1 || true
+          echo "::notice title=resolve::$(head -c 200 resolve.txt)"
 
       - name: Typecheck (react-router typegen + tsc)
         run: |
@@ -76,11 +80,12 @@ jobs:
         if: failure()
         run: |
           if [ -f typecheck.log ]; then
-            grep -E "error TS[0-9]+|TS[0-9]{4}|Cannot find|Error:" typecheck.log | head -n 12 | while IFS= read -r line; do
+            head -n 8 typecheck.log | while IFS= read -r line; do
+              echo "::notice title=log::${line}"
+            done
+            grep -E "error TS[0-9]+|TS[0-9]{4}|Cannot find|Error:" typecheck.log | head -n 6 | while IFS= read -r line; do
               echo "::error title=typecheck::${line}"
             done
-            echo "=== последние строки вывода ==="
-            tail -n 30 typecheck.log
           else
             echo "::error title=typecheck::typecheck.log не создан (падение до запуска typecheck)"
           fi
