@@ -49,11 +49,21 @@ jobs:
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
             echo "package-lock.json отсутствует — генерируем через npm install --package-lock-only."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --include=dev
           fi
 
       - name: Install dependencies (npm ci)
-        run: npm ci
+        run: npm ci --include=dev
+
+      # Временная диагностика на период bootstrap (пока нет package-lock.json):
+      # публикует факты в аннотации, т.к. логи приватные.
+      - name: Diagnostics (temporary)
+        run: |
+          echo "::notice title=node::$(node -v) / npm $(npm -v)"
+          echo "::notice title=npm-config::omit=[$(npm config get omit)] node_env=[${NODE_ENV:-unset}]"
+          echo "::notice title=rr-dev-scope::$(ls node_modules/@react-router 2>&1 | tr '\n' ' ')"
+          node -e "const l=require('./package-lock.json');const p=l.packages||{};const k=Object.keys(p).filter(x=>x.includes('@react-router/dev'));console.log(k.map(x=>x+' dev='+p[x].dev).join(' | ')||'NOT IN LOCK')" > lockinfo.txt 2>&1 || true
+          echo "::notice title=lock::$(cat lockinfo.txt 2>/dev/null | head -c 300)"
 
       - name: Typecheck (react-router typegen + tsc)
         run: |
