@@ -67,6 +67,16 @@
     0 0 0 2px var(--ex-bg),
     0 0 0 4px var(--ex-violet);
 
+  /* Стекло, свечения, затемнения (Black Mist) — производные слои сцены */
+  --ex-glass-white: rgb(255 255 255 / 8%);
+  --ex-glass-white-strong: rgb(255 255 255 / 20%);
+  --ex-glass-white-rim: rgb(255 255 255 / 30%);
+  --ex-glass-white-sheen: rgb(255 255 255 / 62%);
+  --ex-scrim: rgb(8 8 11 / 88%);
+  --ex-mist-violet: rgb(139 92 246 / 26%);
+  --ex-mist-blue: rgb(59 130 246 / 20%);
+  --ex-mist-coral: rgb(255 107 91 / 16%);
+
   /* Движение (значения на будущее; анимации на Этапе 2A не используются) */
   --ex-dur-fast: 120ms;
   --ex-dur-base: 220ms;
