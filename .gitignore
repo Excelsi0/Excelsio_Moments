@@ -33,6 +33,7 @@ build/
 out/
 coverage/
 .vite/
+.react-router/
 .cache/
 .turbo/
 *.tsbuildinfo
