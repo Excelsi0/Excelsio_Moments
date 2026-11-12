@@ -33,74 +33,14 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 24
-          # Кэш npm не включаем: до появления зафиксированного package-lock.json
-          # кэшировать нечего (D-023, Этап 2Б).
-          package-manager-cache: false
-
-      # Временно: lock-файла в репозитории ещё нет. Генерируем его из package.json
-      # без запуска скриптов жизненного цикла, чтобы дальше использовать `npm ci`.
-      # Как только package-lock.json попадёт в репозиторий, шаг будет пропущен.
-      - name: Ensure lockfile
-        id: lockfile
-        run: |
-          if [ -f package-lock.json ]; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-            echo "package-lock.json уже в репозитории — перегенерация не нужна."
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "package-lock.json отсутствует — генерируем через npm install --package-lock-only."
-            npm install --package-lock-only --ignore-scripts --include=dev
-          fi
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
 
       - name: Install dependencies (npm ci)
         run: npm ci --include=dev
 
-      # Временная диагностика на период bootstrap (пока нет package-lock.json):
-      # публикует факты в аннотации, т.к. логи приватные.
-      - name: Diagnostics (temporary)
-        run: |
-          echo "::notice title=node::$(node -v) / npm $(npm -v)"
-          echo "::notice title=dev-dir::$(ls node_modules/@react-router/dev 2>&1 | head -n 20 | tr '\n' ' ')"
-          if [ -f node_modules/@react-router/dev/package.json ]; then
-            echo "::notice title=pkg-file::PRESENT"
-          else
-            echo "::notice title=pkg-file::MISSING"
-          fi
-          node -e "try{console.log(require.resolve('@react-router/dev/package.json'))}catch(e){console.log('RESOLVE_ERR: '+(e.code||e.message))}" > resolve.txt 2>&1 || true
-          echo "::notice title=resolve::$(head -c 200 resolve.txt)"
-
       - name: Typecheck (react-router typegen + tsc)
-        run: |
-          set -o pipefail
-          npm run typecheck 2>&1 | tee typecheck.log
-
-      # Диагностика без доступа к логам: коды ошибок TypeScript/typegen
-      # публикуются как аннотации чек-рана (они доступны через GitHub API).
-      - name: Report typecheck diagnostics
-        if: failure()
-        run: |
-          if [ -f typecheck.log ]; then
-            head -n 8 typecheck.log | while IFS= read -r line; do
-              echo "::notice title=log::${line}"
-            done
-            grep -E "error TS[0-9]+|TS[0-9]{4}|Cannot find|Error:" typecheck.log | head -n 6 | while IFS= read -r line; do
-              echo "::error title=typecheck::${line}"
-            done
-          else
-            echo "::error title=typecheck::typecheck.log не создан (падение до запуска typecheck)"
-          fi
+        run: npm run typecheck
 
       - name: Production build (react-router build)
         run: npm run build
-
-      # Артефакт доступен в разделе Actions → нужный запуск → Artifacts.
-      # Он нужен, чтобы добавить package-lock.json в репозиторий отдельным коммитом
-      # (workflow ничего не коммитит сам).
-      - name: Upload generated package-lock.json
-        if: steps.lockfile.outputs.found == 'false'
-        uses: actions/upload-artifact@v7
-        with:
-          name: package-lock
-          path: apps/web/package-lock.json
-          if-no-files-found: error
-          retention-days: 14
