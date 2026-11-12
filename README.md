@@ -5,7 +5,7 @@
 - **Домен (план):** `excelsio-moments.ru`
 - **Репозиторий:** [Excelsi0/Excelsio_Moments](https://github.com/Excelsi0/Excelsio_Moments)
 - **Основная ветка:** `main`
-- **Статус:** Этап 1.5 — архитектурное ревью и подготовка к разработке (кода приложения ещё нет)
+- **Статус:** Этап 2A — минимальный scaffold приложения (React Router 7 Framework Mode, SSR). Сборка ещё не проверялась: `npm install` и CI — Этап 2B.
 
 ---
 
@@ -89,22 +89,20 @@ EXCELSIO 2.0 — следующая версия личного сайта. Пе
 
 ---
 
-## 6. Локальный запуск (появится на Этапе 2)
+## 6. Локальный запуск
 
-Приложение появляется на Этапе 2. Команды запускаются в каталоге `apps/web/`:
+Приложение находится в `apps/web/`. Зависимости пока не установлены и `package-lock.json` не сгенерирован (Этап 2B):
 
 ```bash
 cd apps/web
-npm install
+npm install        # создаст package-lock.json (делает владелец или CI)
 npm run dev        # SSR dev-сервер
-npm run build      # production-сборка
+npm run build      # production-сборка (build/client + build/server)
 npm run start      # запуск собранного приложения
-npm run typecheck  # проверка типов
-npm run lint       # линтер
-npm run test       # тесты
+npm run typecheck  # react-router typegen + tsc
 ```
 
-Пока приложение не создано, эти команды не работают — они зафиксированы здесь как контракт. В среде Android/Acode сборка и проверки выполняются в **GitHub Actions** (агент не имеет shell-инструмента), см. `docs/DECISIONS.md`, D-023.
+Скрипты `lint` и `test` появятся вместе с ESLint и Vitest. В среде Android/Acode сборка и проверки выполняются в **GitHub Actions** (агент не имеет shell-инструмента), см. `docs/DECISIONS.md`, D-023. **Фактический запуск и сборка пока не проверены.**
 
 ---
 
