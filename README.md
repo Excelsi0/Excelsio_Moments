@@ -56,7 +56,9 @@ EXCELSIO 2.0 — следующая версия личного сайта. Пе
 │   ├── index.html
 │   └── css/  js/  icon/  img/
 └── apps/
-    └── web/              # EXCELSIO 2.0 (появится на Этапе 2)
+    └── web/              # EXCELSIO 2.0 (React Router 7 Framework Mode)
+        ├── package.json  tsconfig.json  vite.config.ts  react-router.config.ts  .nvmrc
+        └── app/          # root.tsx, routes.ts, routes/home.tsx, styles/
 ```
 
 **Важно:** каталог `src/` содержит первую версию сайта. По решению владельца он **не перемещается и не изменяется** (см. `docs/DECISIONS.md`, D-021). Новая версия будет жить в `apps/web/` со своим `package.json` и каталогом `app/`, поэтому старая и новая структуры не конфликтуют. GitHub Pages для репозитория не включён — публикация v1 идёт не из этого репозитория и от этих изменений не зависит.
