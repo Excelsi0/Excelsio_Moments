@@ -44,7 +44,7 @@
     inline-size: min(118vw, 760px);
     aspect-ratio: 1;
     translate: -50% 0;
-    background: radial-gradient(closest-side, rgb(139 92 246 / 26%), transparent 72%);
+    background: radial-gradient(closest-side, var(--ex-mist-violet), transparent 72%);
   }
 
   &--blue {
@@ -52,7 +52,7 @@
     inset-inline-end: -32%;
     inline-size: min(90vw, 560px);
     aspect-ratio: 1;
-    background: radial-gradient(closest-side, rgb(59 130 246 / 20%), transparent 74%);
+    background: radial-gradient(closest-side, var(--ex-mist-blue), transparent 74%);
   }
 
   &--coral {
@@ -60,7 +60,7 @@
     inset-inline-start: -26%;
     inline-size: min(72vw, 420px);
     aspect-ratio: 1;
-    background: radial-gradient(closest-side, rgb(255 107 91 / 16%), transparent 76%);
+    background: radial-gradient(closest-side, var(--ex-mist-coral), transparent 76%);
   }
 }
 
@@ -242,7 +242,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgb(255 255 255 / 62%),
+    var(--ex-glass-white-sheen),
     transparent
   );
 
@@ -255,7 +255,6 @@
     opacity: 0.5;
     transform: translate3d(0, calc(var(--hero-py) * 16px), 0);
   }
-
   &--b {
     inset-block-start: 42%;
     inset-inline: 34% 6%;
@@ -270,7 +269,7 @@
 .hero__rim {
   position: absolute;
   inset: 0;
-  border: 1px solid rgb(255 255 255 / 30%);
+  border: 1px solid var(--ex-glass-white-rim);
   border-radius: inherit;
   mask-image: linear-gradient(
     152deg,
@@ -316,7 +315,7 @@
     z-index: -1;
     background: radial-gradient(
       72% 100% at 22% 62%,
-      rgb(8 8 11 / 88%),
+      var(--ex-scrim),
       transparent 72%
     );
     pointer-events: none;
@@ -355,7 +354,7 @@
   inset-inline-start: 0;
   display: block;
   color: transparent;
-  -webkit-text-stroke: 1px rgb(255 255 255 / 20%);
+  -webkit-text-stroke: 1px var(--ex-glass-white-strong);
   translate: 5px 6px;
   opacity: 0.9;
 }
