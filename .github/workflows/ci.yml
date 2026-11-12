@@ -1,0 +1,74 @@
+name: CI
+
+# Запуск: push в main при изменениях приложения или самого workflow + ручной запуск.
+# Проверки выполняются в облаке, т.к. в среде Android/Acode нет shell (D-023).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: typecheck + build (Node 24)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js 24 LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # Кэш npm не включаем: до появления зафиксированного package-lock.json
+          # кэшировать нечего (D-023, Этап 2Б).
+          package-manager-cache: false
+
+      # Временно: lock-файла в репозитории ещё нет. Генерируем его из package.json
+      # без запуска скриптов жизненного цикла, чтобы дальше использовать `npm ci`.
+      # Как только package-lock.json попадёт в репозиторий, шаг будет пропущен.
+      - name: Ensure lockfile
+        id: lockfile
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "package-lock.json уже в репозитории — перегенерация не нужна."
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "package-lock.json отсутствует — генерируем через npm install --package-lock-only."
+            npm install --package-lock-only --ignore-scripts
+          fi
+
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      - name: Typecheck (react-router typegen + tsc)
+        run: npm run typecheck
+
+      - name: Production build (react-router build)
+        run: npm run build
+
+      # Артефакт доступен в разделе Actions → нужный запуск → Artifacts.
+      # Он нужен, чтобы добавить package-lock.json в репозиторий отдельным коммитом
+      # (workflow ничего не коммитит сам).
+      - name: Upload generated package-lock.json
+        if: steps.lockfile.outputs.found == 'false'
+        uses: actions/upload-artifact@v7
+        with:
+          name: package-lock
+          path: apps/web/package-lock.json
+          if-no-files-found: error
+          retention-days: 14
