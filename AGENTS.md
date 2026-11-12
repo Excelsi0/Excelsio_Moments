@@ -82,7 +82,7 @@
 - Добавлять тяжёлые библиотеки анимаций/UI-китов «на всякий случай».
 - Делать `push --force`, удалять ветки, переписывать историю.
 - Оставлять `console.log` в production-коде, `TODO` без задачи в `docs/ROADMAP.md`.
-- Молча менять API-контракт: сначала `docs/ARCHITECTURE.md` и `packages/shared`, затем код.
+- Молча менять контракт данных: сначала `docs/ARCHITECTURE.md` и Zod-схемы в `apps/web/app/lib/validation`, затем код.
 
 ---
 
