@@ -13,7 +13,8 @@
 | --- | --- | --- | --- |
 | 1 | Архитектура и документация | ✅ | `docs/`, `AGENTS.md`, `README.md`, `.gitignore` |
 | 1.5 | Ревизия архитектуры | ✅ | React Router 7 Framework Mode, SQLite, упрощённая структура; обновлённые ADR |
-| 2 | Scaffold + CI | ⏸ | RR7-приложение в `apps/web/`, токены, скелет маршрутов, зелёный CI |
+| 2A | Минимальный scaffold | ✅ | `apps/web/` с React Router 7 Framework Mode, SSR, токены, главная-заглушка |
+| 2B | CI и проверка сборки | ⏸ | `package-lock.json`, зелёный workflow в GitHub Actions |
 | 3 | Данные: SQLite + Drizzle | ⬜ | Схема, миграции, сид админа, бэкап-скрипт |
 | 4 | Авторизация и каркас админки | ⬜ | Вход/выход, БД-сессии, guard, layout `/admin` |
 | 5 | Медиа-конвейер | ⬜ | Загрузка, sharp-варианты (3 ширины × 2 формата + OG), blurhash, storage-адаптер |
@@ -60,31 +61,50 @@
 
 ---
 
-## Этап 2 — Scaffold + CI ⏸
+## Этап 2A — Минимальный scaffold ✅
 
-**Цель:** работающий каркас SSR-приложения и автоматические проверки, не требующие Android-терминала.
+**Цель:** работоспособная основа SSR-приложения без дизайна и backend.
 
-**Результат:**
+**Результат (создано):**
 
-1. `npm create react-router` → приложение в `apps/web/` (React Router 7.18.x, TypeScript, SSR включён), без затрагивания `src/`.
-2. `app/styles/tokens.css` со всеми токенами из `DESIGN_SYSTEM.md` + `reset.scss`, `base.scss`, миксины, подключение SCSS.
-3. Скелет маршрутов: `/`, `/development`, `/photography`, `/about`, `/contact`, `*` (404), `/admin/login` (заглушка), layout `root.tsx` + `CapsuleNav` + `Footer`.
-4. `app/server/config.ts` (Zod-валидация env) и `.env.example`.
-5. `app/content/ru.ts` — тексты интерфейса.
-6. ESLint (flat) + Prettier + `tsconfig` strict; скрипты `dev`, `build`, `typecheck`, `lint`, `format`, `test`.
-7. `.github/workflows/ci.yml` (Node 24, `working-directory: apps/web`): `npm ci` → `typecheck` → `lint` → `test` → `build`.
-8. `.nvmrc` (`24`) и `engines.node` в `package.json`.
+- `apps/web/package.json` (React Router 7.18.5, React 19.3.1, Vite 7.3.8, TypeScript 5.9.3, SCSS, точные версии без `^`).
+- `apps/web/tsconfig.json` (`strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, alias `~/*`).
+- `apps/web/react-router.config.ts` (`ssr: true`), `apps/web/vite.config.ts` (официальный плагин `@react-router/dev/vite`).
+- `apps/web/.nvmrc` (24), `engines.node: ">=24"`.
+- `apps/web/app/root.tsx` (документ, `Meta`/`Links`/`Scripts`/`ScrollRestoration`), `app/routes.ts` (явная конфигурация), `app/routes/home.tsx` (заглушка).
+- `apps/web/app/styles/tokens.css` (`--ex-*`), `app/styles/base.scss` (mobile-first от 360 px).
+- Обновлён корневой `.gitignore` (`.react-router/`).
+
+**Сознательно не сделано на 2A:** `npm install` и генерация `package-lock.json` (нет shell), CI-workflow, ESLint/Prettier, Vitest, остальные маршруты, `app/server/*`, дизайн и анимации.
 
 **Критерии готовности:**
 
-- [ ] `npm run build` локально/в CI завершается успешно, отчёт по размеру бандла приложен.
-- [ ] CI-workflow **фактически выполнился** и зелёный (скрин/ссылка на прогон).
-- [ ] `typecheck` и `lint` — 0 ошибок.
-- [ ] На 360×640 нет горизонтального скролла; капсульная навигация доступна с клавиатуры.
-- [ ] В клиентский бандл не попадает серверный код (`app/server/*`) — проверка отчёта сборки.
-- [ ] `src/` не изменён (`git status`/список изменённых файлов).
+- [x] Файлы созданы и сохранены в GitHub.
+- [x] `src/` (v1) не изменён.
+- [ ] `npm install` выполнен, `package-lock.json` закоммичен — Этап 2B.
+- [ ] `npm run typecheck` / `npm run build` выполнены — Этап 2B.
 
-**Оценка:** 2–3 сессии. **Блокеры:** утверждение D-016, D-021, D-023; доступ к созданию `.github/workflows/` (scope `workflow`).
+---
+
+## Этап 2B — CI и проверка сборки ⏸
+
+**Цель:** убедиться, что приложение действительно собирается, и получить автоматические проверки без Android-терминала.
+
+**Результат:**
+
+1. `npm install` в `apps/web` (владельцем или в CI) → генерация и коммит `package-lock.json`.
+2. `.github/workflows/ci.yml`: Node 24, `working-directory: apps/web`, `npm ci` → `typecheck` → `build` (позже `lint`/`test`).
+3. Исправление всех ошибок типов/сборки, найденных первым прогоном.
+
+**Критерии готовности:**
+
+- [ ] `package-lock.json` в репозитории (сгенерирован настоящим `npm install`).
+- [ ] CI-workflow фактически выполнился и зелёный (ссылка на прогон).
+- [ ] `npm run typecheck` и `npm run build` — без ошибок.
+- [ ] Отчёт по размеру клиентского и серверного бандла приложен.
+- [ ] Заглушка открывается в браузере (проверка на 360 px скриншотом/описанием).
+
+**Блокеры:** доступ к созданию `.github/workflows/` (scope `workflow` у токена плагина GitHub).
 
 ---
 
@@ -100,7 +120,7 @@
 - [ ] `backup` создаёт консистентную копию при открытом соединении; восстановление проверено на копии.
 - [ ] CI зелёный, тип `timestamp_ms`/`json` корректно сериализуется (тест).
 
-**Оценка:** 2 сессии. **Блокеры:** D-017, D-018.
+**Оценка:** 2 сессии. **Блокеры:** D-018 (выбор драйвера SQLite) и первый зелёный прогон CI.
 
 ---
 
