@@ -1,0 +1,76 @@
+/*
+ * EXCELSIO 2.0 — дизайн-токены (Этап 2A, минимальный набор).
+ * Источник значений: docs/DESIGN_SYSTEM.md.
+ * Правило: в компонентах используются только var(--ex-*), без «магических» значений.
+ */
+
+:root {
+  /* Фон и поверхности */
+  --ex-bg: #08080b;
+  --ex-bg-deep: #050507;
+  --ex-surface: #101016;
+  --ex-surface-2: #16161f;
+  --ex-line: rgb(255 255 255 / 8%);
+  --ex-line-strong: rgb(255 255 255 / 16%);
+
+  /* Текст */
+  --ex-text: #f3f3f7;
+  --ex-text-muted: #9c9cad;
+  --ex-text-dim: #6e6e80;
+
+  /* Акценты */
+  --ex-violet: #8b5cf6;
+  --ex-violet-deep: #6d28d9;
+  --ex-blue: #3b82f6;
+  --ex-blue-deep: #1d4ed8;
+  --ex-coral: #ff6b5b;
+  --ex-coral-soft: #ff9b8f;
+
+  /* Типографика */
+  --ex-font-body:
+    "Inter", system-ui, -apple-system, "Segoe UI", roboto, "Helvetica Neue",
+    arial, sans-serif;
+  --ex-font-display: var(--ex-font-body);
+  --ex-fs-display: clamp(2.5rem, 11vw, 4rem);
+  --ex-fs-body: 1rem;
+  --ex-fs-sm: 0.875rem;
+  --ex-fs-xs: 0.75rem;
+  --ex-lh-tight: 1.05;
+  --ex-lh-body: 1.6;
+  --ex-tracking-display: -0.03em;
+  --ex-tracking-caps: 0.14em;
+  --ex-measure: 62ch;
+
+  /* Пространство */
+  --ex-space-1: 4px;
+  --ex-space-2: 8px;
+  --ex-space-3: 12px;
+  --ex-space-4: 16px;
+  --ex-space-5: 20px;
+  --ex-space-6: 24px;
+  --ex-space-8: 32px;
+  --ex-space-10: 40px;
+  --ex-space-12: 48px;
+  --ex-space-16: 64px;
+  --ex-gutter: clamp(16px, 5vw, 40px);
+  --ex-section-y: clamp(48px, 12vw, 120px);
+  --ex-container: 1280px;
+
+  /* Радиусы, тени, фокус */
+  --ex-radius-sm: 8px;
+  --ex-radius-md: 16px;
+  --ex-radius-lg: 24px;
+  --ex-radius-pill: 999px;
+  --ex-shadow-glow: 0 0 60px rgb(139 92 246 / 25%);
+  --ex-shadow-card: 0 8px 40px rgb(0 0 0 / 45%);
+  --ex-focus-ring:
+    0 0 0 2px var(--ex-bg),
+    0 0 0 4px var(--ex-violet);
+
+  /* Движение (значения на будущее; анимации на Этапе 2A не используются) */
+  --ex-dur-fast: 120ms;
+  --ex-dur-base: 220ms;
+  --ex-dur-slow: 420ms;
+  --ex-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ex-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+}
