@@ -36,7 +36,7 @@ export default function Home() {
       <header className="hero__header">
         <a className="hero__brand" href="/" aria-label="EXCELSIO — на главную">
           <span className="hero__brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+            <svg viewBox="0 0 24 24" role="presentation">
               <path d="M12 2.5 21.5 12 12 21.5 2.5 12Z" />
             </svg>
           </span>
@@ -63,7 +63,7 @@ export default function Home() {
             <span className="hero__rim" />
           </span>
 
-          <svg className="hero__contour" viewBox="0 0 320 320" focusable="false">
+          <svg className="hero__contour" viewBox="0 0 320 320" role="presentation">
             <defs>
               <linearGradient id="heroContourViolet" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0.85" />
