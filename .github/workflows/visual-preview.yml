@@ -1,8 +1,7 @@
 name: Visual Preview
 
 # Ручные скриншоты главной страницы без локального терминала (D-023).
-# Запуск: вручную (workflow_dispatch) или при изменении этого файла —
-# последнее нужно, чтобы первый прогон проверился в CI, а не «на словах».
+# Запуск: вручную (workflow_dispatch) или при изменении этого файла.
 on:
   workflow_dispatch:
   push:
@@ -19,6 +18,10 @@ concurrency:
 
 env:
   PLAYWRIGHT_VERSION: "1.65.0"
+  # Фиксированный адрес dev-сервера: без разбора цветного вывода Vite.
+  APP_HOST: "127.0.0.1"
+  APP_PORT: "5173"
+  APP_URL: "http://127.0.0.1:5173/"
 
 jobs:
   screenshots:
@@ -43,50 +46,65 @@ jobs:
         run: npm ci --include=dev
 
       - name: Start dev server
+        env:
+          # Отключаем цвет в логах: они читаются глазами, ANSI больше не нужен.
+          FORCE_COLOR: "0"
+          NO_COLOR: "1"
         run: |
-          nohup npm run dev > dev-server.log 2>&1 &
+          nohup npm run dev -- --host "${APP_HOST}" --port "${APP_PORT}" > dev-server.log 2>&1 &
           echo $! > dev-server.pid
-          echo "Dev-сервер запущен в фоне (pid $(cat dev-server.pid))"
+          echo "Dev-сервер запущен в фоне (pid $(cat dev-server.pid)) на ${APP_URL}"
 
-      # Vite печатает фактический адрес в лог: не полагаемся на угадывание порта.
+      # Проверка строго по фиксированному адресу. Никакого grep по логу.
       - name: Wait for HTTP 200
         run: |
           set -uo pipefail
-          BASE_URL=""
-          for _ in $(seq 1 60); do
-            if [ -f dev-server.log ]; then
-              CANDIDATE="$(grep -oE 'http://(localhost|127\.0\.0\.1):[0-9]+' dev-server.log | head -n 1 || true)"
-              if [ -n "${CANDIDATE}" ] && curl -fsS --max-time 15 "${CANDIDATE}/" -o /dev/null; then
-                BASE_URL="${CANDIDATE}"
-                break
-              fi
+          for attempt in $(seq 1 60); do
+            if curl -fsS --max-time 10 "${APP_URL}" -o /dev/null; then
+              echo "::notice title=dev-server::Отвечает ${APP_URL} (попытка ${attempt})"
+              exit 0
             fi
             sleep 2
           done
-          if [ -z "${BASE_URL}" ]; then
-            echo "::error title=dev-server::Dev-сервер не ответил за 120 секунд"
-            tail -n 100 dev-server.log || true
-            exit 1
-          fi
-          echo "BASE_URL=${BASE_URL}" >> "$GITHUB_ENV"
-          echo "::notice title=dev-server::Готов: ${BASE_URL}"
+          echo "::error title=dev-server::${APP_URL} не ответил за 120 секунд"
+          echo "===== dev-server.log ====="
+          tail -n 100 dev-server.log || true
+          exit 1
 
       # Playwright ставится только в runner: в package.json не попадает.
       - name: Install Playwright Chromium
         run: npx --yes playwright@${PLAYWRIGHT_VERSION} install --with-deps chromium
 
+      # Работаем от корня репозитория, чтобы пути совпадали с upload-artifact.
       - name: Take screenshots
+        working-directory: .
         run: |
-          mkdir -p ../preview
+          set -euo pipefail
+          mkdir -p apps/web/preview
           npx --yes playwright@${PLAYWRIGHT_VERSION} screenshot \
             --viewport-size="390,844" \
             --wait-for-timeout=2000 \
-            "${BASE_URL}/" ../preview/home-mobile-390x844.png
+            "http://${APP_HOST}:${APP_PORT}/" \
+            apps/web/preview/home-mobile-390x844.png
           npx --yes playwright@${PLAYWRIGHT_VERSION} screenshot \
             --viewport-size="1440,900" \
             --wait-for-timeout=2000 \
-            "${BASE_URL}/" ../preview/home-desktop-1440x900.png
-          ls -la ../preview
+            "http://${APP_HOST}:${APP_PORT}/" \
+            apps/web/preview/home-desktop-1440x900.png
+          ls -la apps/web/preview
+
+      # Отсутствие или пустота файла — явная ошибка, а не предупреждение.
+      - name: Verify screenshots exist
+        working-directory: .
+        run: |
+          set -euo pipefail
+          for file in apps/web/preview/home-mobile-390x844.png apps/web/preview/home-desktop-1440x900.png; do
+            if [ ! -s "$file" ]; then
+              echo "::error title=screenshots::Файл отсутствует или пуст: $file"
+              exit 1
+            fi
+            echo "ok: $file ($(wc -c < "$file") байт)"
+          done
 
       - name: Show dev server log on failure
         if: failure()
@@ -104,6 +122,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: visual-preview-screenshots
-          path: preview/*.png
-          if-no-files-found: warn
+          path: apps/web/preview/*.png
+          if-no-files-found: error
           retention-days: 14
