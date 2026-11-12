@@ -1,0 +1,35 @@
+{
+  "name": "excelsio-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@react-router/node": "7.18.5",
+    "@react-router/serve": "7.18.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-router": "7.18.5"
+  },
+  "devDependencies": {
+    "@react-router/dev": "7.18.5",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "sass": "1.108.2",
+    "typescript": "5.9.3",
+    "vite": "7.3.8"
+  }
+}
