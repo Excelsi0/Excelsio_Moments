@@ -56,7 +56,24 @@ jobs:
         run: npm ci
 
       - name: Typecheck (react-router typegen + tsc)
-        run: npm run typecheck
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee typecheck.log
+
+      # Диагностика без доступа к логам: коды ошибок TypeScript/typegen
+      # публикуются как аннотации чек-рана (они доступны через GitHub API).
+      - name: Report typecheck diagnostics
+        if: failure()
+        run: |
+          if [ -f typecheck.log ]; then
+            grep -E "error TS[0-9]+|TS[0-9]{4}|Cannot find|Error:" typecheck.log | head -n 12 | while IFS= read -r line; do
+              echo "::error title=typecheck::${line}"
+            done
+            echo "=== последние строки вывода ==="
+            tail -n 30 typecheck.log
+          else
+            echo "::error title=typecheck::typecheck.log не создан (падение до запуска typecheck)"
+          fi
 
       - name: Production build (react-router build)
         run: npm run build
